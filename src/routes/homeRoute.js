@@ -7,6 +7,7 @@ router.get('/', (req, res) => {
         title: 'Odin Cloud Storage',
         stylesheet: '/styles/homepage.css',
         errors: null,
+        data: null,
     })
 });
 
