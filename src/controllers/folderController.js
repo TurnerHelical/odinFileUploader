@@ -5,6 +5,7 @@ async function postNewFolder(req, res, next) {
         if (!req.user) {
             return res.redirect('/');
         }
+        console.log(req.body.name);
         await prisma.folder.create({
             data: {
                 name: req.body.name,

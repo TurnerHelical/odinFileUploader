@@ -1,11 +1,15 @@
 <div>
+    <button id="newFolderBtn">Add new file</button>
     <h2>Folders are here</h2>
     <% if (currentUser.folders.length <= 0) { %>
         <p>No Folders yet! Set some up!</p>
     <%}%>
     <% currentUser.folders.forEach((folder) => { %>
         <div>
-            <p>test folder</p>
+            <p><%= folder.name%></p>
         </div>
     <%}) %>
+    <modal class="" id="modal">
+      <form action="" method="" id="modalForm">
+    </modal>
 </div>
