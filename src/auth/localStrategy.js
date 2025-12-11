@@ -1,9 +1,9 @@
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma.js';
 
 export const localStrategy = new LocalStrategy(
-    { usernameField: email },
+    { usernameField: 'email' },
     async (email, password, done) => {
         try {
             const user = await prisma.user.findUnique({ where: { email } });
@@ -14,6 +14,7 @@ export const localStrategy = new LocalStrategy(
             if (!match) {
                 return done(null, false, { message: 'Invalid credentials' })
             }
+            return done(null, user);
         } catch (err) {
             return done(err);
         }

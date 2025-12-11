@@ -1,6 +1,6 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
-import passport from '../auth/passport';
+import passport from '../auth/passport.js';
 
 async function postLogin(req, res, next) {
     passport.authenticate('local', (err, user, info) => {
@@ -8,9 +8,7 @@ async function postLogin(req, res, next) {
             return next(err);
         }
         if (!user) {
-            res.render('homepage', {
-                title: 'Odin Cloud Storage',
-                stylesheet: '/styles/homepage.css',
+            return res.render('homepage', {
                 errors: [{ msg: info?.message || 'Invalid credentials' }],
                 data: { email: req.body.email || '' },
             });
@@ -43,15 +41,13 @@ async function postSignup(req, res, next) {
             return res.redirect('/');
         })
     } catch (err) {
-        if (err.code === '23505') {
+        if (err.code === 'P2002') {
             return res.render('signUp', {
-                title: "Sign Up Page",
-                stylesheet: "/styles/signUp.css",
                 errors: [{ msg: "Email or username already in use" }],
                 data: req.body
             });
         }
-        next(err);
+        return next(err);
     }
 }
 
@@ -60,9 +56,9 @@ async function getSignout(req, res, next) {
         if (err) {
             return next(err);
         }
-        res.redirect('/');
+        return res.redirect('/');
     })
 }
 
-export { postLogin, postSignup, getSignout };
+export default { postLogin, postSignup, getSignout };
 

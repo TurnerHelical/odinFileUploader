@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
 
-import homeRoute from './homeRoute';
-import userRoute from './userRoute';
-import fileRoute from './fileRoute';
-import folderRoute from './folderRoute';
+import homeRoute from './homeRoute.js';
+import userRoute from './userRoute.js';
+import fileRoute from './fileRoute.js';
+import folderRoute from './folderRoute.js';
 
 const router = Router();
 

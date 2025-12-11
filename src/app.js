@@ -4,11 +4,11 @@ import session from 'express-session';
 import { fileURLToPath } from 'url';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 
-import { prisma } from './lib/prisma';
-import { config } from './config/env';
-import passport from './auth/passport';
+import { prisma } from './lib/prisma.js';
+import { config } from './config/env.js';
+import passport from './auth/passport.js';
 
-import indexRouter from './routes/indexRouter';
+import indexRouter from './routes/indexRouter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +42,8 @@ app.use(passport.session());
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user || null;
+    res.locals.title = 'Odin Cloud Storage';
+    res.locals.stylesheet = '/styles/homepage.css';
     next();
 });
 
