@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <%- include('partials/head') %>
+    <body>
+        <main>
+        <% if (!currentUser) { %>
+            <%- include('partials/auth') %>
+        <%} else {%>
+            <%- include('partials/content') %>
+          <%}%>  
+        </main>
+    </body>
+</html>

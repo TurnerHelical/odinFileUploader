@@ -3,7 +3,10 @@ import bcrypt from 'bcrypt';
 import { prisma } from '../lib/prisma.js';
 
 export const localStrategy = new LocalStrategy(
-    { usernameField: 'email' },
+    {
+        usernameField: 'loginEmail',
+        passwordField: 'loginPassword',
+    },
     async (email, password, done) => {
         try {
             const user = await prisma.user.findUnique({ where: { email } });

@@ -27,8 +27,9 @@ app.use(
         secret: config.sessionSecret,
         resave: false,
         saveUninitialized: false,
+        rolling: true,
         cookie: {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 60 * 60 * 1000,
         },
         store: new PrismaSessionStore(prisma, {
             checkPeriod: 2 * 60 * 1000,

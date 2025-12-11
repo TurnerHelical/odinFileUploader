@@ -10,7 +10,7 @@ async function postLogin(req, res, next) {
         if (!user) {
             return res.render('homepage', {
                 errors: [{ msg: info?.message || 'Invalid credentials' }],
-                data: { email: req.body.email || '' },
+                data: { email: req.body.loginEmail || '' },
             });
         }
         req.logIn(user, (err2) => {
@@ -24,14 +24,14 @@ async function postLogin(req, res, next) {
 
 async function postSignup(req, res, next) {
     try {
-        const password = req.body.password;
-        const passwordHash = await bcrypt.hash(password, 10);
+
+        const passwordHash = await bcrypt.hash(req.body.signupPassword, 10);
 
         const user = await prisma.user.create({
             data: {
-                email: req.body.email,
+                email: req.body.signupEmail,
                 passwordHash,
-                name: req.body.name,
+                name: req.body.signupName,
             },
         });
         req.login(user, (err) => {

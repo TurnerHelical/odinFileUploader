@@ -1,0 +1,11 @@
+<div>
+    <h2>Folders are here</h2>
+    <% if (currentUser.folders.length <= 0) { %>
+        <p>No Folders yet! Set some up!</p>
+    <%}%>
+    <% currentUser.folders.forEach((folder) => { %>
+        <div>
+            <p>test folder</p>
+        </div>
+    <%}) %>
+</div>
