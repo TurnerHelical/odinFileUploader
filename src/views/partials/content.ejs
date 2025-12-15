@@ -1,13 +1,31 @@
 <div>
-    <button id="newFolderBtn">Add new file</button>
+    <button id="newFolderBtn">Add new folder</button>
     <h2>Folders are here</h2>
-    <% if (currentUser.folders.length <= 0) { %>
+    <% if (!currentUser.folders || currentUser.folders.length <= 0) { %>
         <p>No Folders yet! Set some up!</p>
     <%}%>
     <% currentUser.folders.forEach((folder) => { %>
         <div>
-            <p><%= folder.name%></p>
+            <p><%= folder.name %></p>
+            <div class="folderOptionsMenu">
+                <ul>
+                    <li>Rename Folder</li>
+                    <li>Delete Folder</li>
+                </ul>
+            </div>
+            <div class="fileDropdownCtr">
+                <% if (!folder.files || folder.files.length <= 0) { %>
+                    <p> No files in this folder yet!</p>
+               <% } %>
+                <% folder.files.forEach((file) => { %>
+                    <div class="fileItem">
+                        <p><%- file.name %></p>    
+                    </div>
+               <% }) %>
+               
+            </div>
         </div>
+        <button class="addFileBtn" data-folderId='<%-folder.id %>'>Add File</button>
     <%}) %>
     <modal class="" id="modal">
       <form action="" method="" id="modalForm">

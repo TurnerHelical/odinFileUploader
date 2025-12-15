@@ -18,7 +18,7 @@ async function postNewFile(req, res, next) {
             return res.status(400).send("Folder not found.");
         }
 
-        const newFile = await prisma.file.create({
+        await prisma.file.create({
             data: {
                 name: req.file.originalname,
                 mimeType: req.file.mimetype,

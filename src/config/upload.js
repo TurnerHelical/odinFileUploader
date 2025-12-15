@@ -5,6 +5,8 @@ import fs from 'fs';
 // Where uploaded files should go
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    console.log("USER:", req.user?.id);
+    console.log("BODY:", req.body);
     const userId = req.user?.id;
     const folderId = Number(req.body.folderId); // You must pass this in your upload form
 
@@ -12,7 +14,7 @@ const storage = multer.diskStorage({
       return cb(new Error('Missing user or folder information.'));
     }
 
-    // Build path: uploads/users/<userId>/<folderName>
+    // Build path: uploads/users/<userId>/<folderId>
     const uploadPath = path.join(
       process.cwd(),
       'uploads',
