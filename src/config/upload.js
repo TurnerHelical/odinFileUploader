@@ -2,19 +2,16 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-// Where uploaded files should go
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log("USER:", req.user?.id);
-    console.log("BODY:", req.body);
     const userId = req.user?.id;
-    const folderId = Number(req.body.folderId); // You must pass this in your upload form
+    const folderId = Number(req.params.folderId);
 
     if (!userId || !folderId) {
       return cb(new Error('Missing user or folder information.'));
     }
 
-    // Build path: uploads/users/<userId>/<folderId>
     const uploadPath = path.join(
       process.cwd(),
       'uploads',
@@ -23,14 +20,13 @@ const storage = multer.diskStorage({
       String(folderId),
     );
 
-    // Create directory if it doesn't exist
+
     fs.mkdirSync(uploadPath, { recursive: true });
 
     cb(null, uploadPath);
   },
 
   filename: (req, file, cb) => {
-    // Save the file using original name (or change if you want)
     cb(null, file.originalname);
   }
 });

@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.appendChild(submit);
         form.appendChild(cancel);
 
-        form.action = "/file";
+        form.action = `/file/${folderId}`;
         form.method = "POST";
         form.enctype = "multipart/form-data"; // required for multer
 
