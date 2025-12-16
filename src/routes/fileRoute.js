@@ -7,6 +7,6 @@ const router = Router();
 
 router.post('/:folderId', ensureAuth, upload.single('file'), controller.postNewFile);
 router.post('/:id/update', ensureAuth, controller.renameFilePost);
-router.get('/:id/delete', ensureAuth, controller.getDeleteFile);
+router.post('/:id/delete', ensureAuth, controller.postDeleteFile);
 
 export default router;

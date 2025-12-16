@@ -2,6 +2,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
+const BASE_UPLOAD_DIR = process.env.UPLOAD_BASE_DIR //|| path.join(process.cwd(), 'uploads');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -13,8 +14,7 @@ const storage = multer.diskStorage({
     }
 
     const uploadPath = path.join(
-      process.cwd(),
-      'uploads',
+      BASE_UPLOAD_DIR,
       'users',
       String(userId),
       String(folderId),

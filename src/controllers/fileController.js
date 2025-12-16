@@ -4,13 +4,17 @@ import fs from 'fs/promises';
 
 async function postNewFile(req, res, next) {
     try {
+        console.log('upload body:', req.body);
+        console.log('folderId raw:', req.body.folderId, '->', Number(req.body.folderId));
+        console.log('userId:', req.user?.id);
+        console.log('file:', req.file?.originalname, req.file?.path);
         const userId = req.user.id;
-        const folderId = Number(req.body.folderId);
+        const folderId = Number(req.params.folderId);
 
         const folder = await prisma.folder.findFirst({
             where: {
                 id: folderId,
-                userId
+                userId,
             }
         });
 
@@ -94,11 +98,11 @@ async function renameFilePost(req, res, next) {
         return next(err);
     }
 }
-async function getDeleteFile(req, res, next) {
+async function postDeleteFile(req, res, next) {
     try {
         if (!req.user) return res.redirect('/');
 
-        const fileId = Number(req.params.id);
+        const fileId = Number(req.params.id); // still from the URL
         const userId = req.user.id;
 
         const file = await prisma.file.findFirst({
@@ -112,16 +116,17 @@ async function getDeleteFile(req, res, next) {
             return res.status(404).send('File not found');
         }
 
-        // Try to remove the file from disk if we have a path
+        // Remove file from disk
         if (file.storagePath) {
             try {
                 await fs.unlink(file.storagePath);
             } catch (fsErr) {
-                // Log and continue – maybe file already gone
+                // File might already be gone — log and continue
                 console.error('Error deleting file from disk:', fsErr.message);
             }
         }
 
+        // Remove DB record
         await prisma.file.deleteMany({
             where: {
                 id: fileId,
@@ -135,4 +140,4 @@ async function getDeleteFile(req, res, next) {
     }
 }
 
-export default { postNewFile, renameFilePost, getDeleteFile };
+export default { postNewFile, renameFilePost, postDeleteFile };

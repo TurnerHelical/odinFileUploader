@@ -8,10 +8,10 @@
         <div>
             <p><%= folder.name %></p>
             <div class="folderOptionsMenu">
-                <ul>
-                    <li>Rename Folder</li>
-                    <li>Delete Folder</li>
-                </ul>
+                <div>
+                  <button class="renameFolder" data-folderId="<%- folder.id %>">Rename Folder</button>
+                  <button class="deleteFolder" data-folderId="<%- folder.id %>">Delete Folder</button>
+                </div>
             </div>
             <div class="fileDropdownCtr">
                 <% if (!folder.files || folder.files.length <= 0) { %>
@@ -19,7 +19,9 @@
                <% } %>
                 <% folder.files.forEach((file) => { %>
                     <div class="fileItem">
-                        <p><%- file.name %></p>    
+                        <p><%- file.name %></p>
+                        <button class="renameFileBtn" data-fileId="<%-file.id%>">Rename File</button>
+                        <button class="deleteFileBtn" data-fileId="<%-file.id%>">Delete File</button>    
                     </div>
                <% }) %>
                
@@ -27,7 +29,103 @@
         </div>
         <button class="addFileBtn" data-folderId='<%-folder.id %>'>Add File</button>
     <%}) %>
-    <modal class="" id="modal">
-      <form action="" method="" id="modalForm">
-    </modal>
+    <div id="modal" class="hidden" aria-hidden="true">
+        <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="background" class="hidden"></div>
+<template id="tpl-add-folder">
+  <form id="form-add-folder" action="/folder" method="POST">
+    <h3 id="modalTitle">Add Folder</h3>
+
+    <label for="folderName">Folder name</label>
+    <input id="folderName" name="name" type="text" required />
+
+    <div class="actions">
+      <button type="submit">Create</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
+<template id="tpl-rename-folder">
+  <form id="form-rename-folder" method="POST">
+    <h3 id="modalTitle">Rename Folder</h3>
+
+    <input type="hidden" name="folderId" id="renameFolderId" />
+
+    <label for="newFolderName">New folder name</label>
+    <input id="newFolderName" name="newName" type="text" required />
+
+    <div class="actions">
+      <button type="submit">Rename</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
+<template id="tpl-delete-folder">
+  <form id="form-delete-folder" method="POST">
+    <h3 id="modalTitle">Delete Folder</h3>
+
+    <p>Are you sure you want to delete this folder?</p>
+    <p><strong id="deleteFolderName"></strong></p>
+
+    <input type="hidden" name="folderId" id="deleteFolderId" />
+
+    <div class="actions">
+      <button type="submit">Delete</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
+<template id="tpl-add-file">
+  <form id="form-add-file" method="POST" enctype="multipart/form-data">
+    <h3 id="modalTitle">Add File</h3>
+
+    <label for="fileInput">Choose file</label>
+    <input id="fileInput" name="file" type="file" required />
+
+    <div class="actions">
+      <button type="submit">Upload</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
+<template id="tpl-rename-file">
+  <form id="form-rename-file" method="POST">
+    <h3 id="modalTitle">Rename File</h3>
+
+    <input type="hidden" name="fileId" id="renameFileId" />
+
+    <label for="newFileName">New file name</label>
+    <input id="newFileName" name="newName" type="text" required />
+
+    <div class="actions">
+      <button type="submit">Rename</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
+<template id="tpl-delete-file">
+  <form id="form-delete-file" method="POST">
+    <h3 id="modalTitle">Delete File</h3>
+
+    <p>Are you sure you want to delete this file?</p>
+    <p><strong id="deleteFileName"></strong></p>
+
+    <input type="hidden" name="fileId" id="deleteFileId" />
+
+    <div class="actions">
+      <button type="submit">Delete</button>
+      <button type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</template>
+
 </div>

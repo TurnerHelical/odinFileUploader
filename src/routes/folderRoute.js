@@ -6,6 +6,6 @@ const router = Router();
 
 router.post('/', ensureAuth, controller.postNewFolder);
 router.post('/:id/update', ensureAuth, controller.postUpdateFolder);
-router.get('/:id/delete', ensureAuth, controller.getDeleteFolder);
+router.post('/:id/delete', ensureAuth, controller.postDeleteFolder);
 
 export default router;

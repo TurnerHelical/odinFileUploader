@@ -1,149 +1,112 @@
+function openModalFromTemplate(templateId) {
+    const tpl = document.getElementById(templateId);
+    if (!tpl) {
+        console.error(`Template not found: ${templateId}`);
+        return;
+    }
+
+    const modal = document.getElementById("modal");
+    const bg = document.getElementById("background");
+    const body = document.getElementById("modalBody");
+
+    if (!modal || !bg || !body) return;
+
+    body.innerHTML = "";
+    body.appendChild(tpl.content.cloneNode(true));
+
+    modal.classList.remove("hidden");
+    bg.classList.remove("hidden");
+
+    // Close buttons inside the injected content
+    body.querySelectorAll("[data-close]").forEach((btn) => {
+        btn.addEventListener("click", closeModal);
+    });
+}
+
+function closeModal() {
+    const modal = document.getElementById("modal");
+    const bg = document.getElementById("background");
+    const body = document.getElementById("modalBody");
+
+    if (modal) modal.classList.add("hidden");
+    if (bg) bg.classList.add("hidden");
+    if (body) body.innerHTML = "";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("modal");
-    const form = document.getElementById("modalForm");
-    const newFolderBtn = document.getElementById("newFolderBtn");
+    const bg = document.getElementById("background");
+    if (bg) bg.addEventListener("click", closeModal);
 
-    // Optional: if you have a background overlay element
-    const background = document.getElementById("background");
-
-    // --- helpers ---
-    function clearForm() {
-        if (!form) return;
-        form.innerHTML = "";
-        form.action = "";
-        form.method = "POST";
-        form.enctype = ""; // set when needed
-    }
-
-    function openModal() {
-        if (!modal) return;
-        modal.classList.remove("hidden");
-        modal.classList.add("visible");
-
-        if (background) {
-            background.classList.remove("hidden");
-            background.classList.add("visible");
-        }
-    }
-
-    function closeModal() {
-        if (!modal) return;
-        modal.classList.add("hidden");
-        modal.classList.remove("visible");
-
-        if (background) {
-            background.classList.add("hidden");
-            background.classList.remove("visible");
-        }
-
-        clearForm();
-    }
-
-    // Close modal if background is clicked (optional)
-    if (background) {
-        background.addEventListener("click", closeModal);
-    }
-
-    // --- New Folder button ---
-    if (newFolderBtn) {
-        newFolderBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            if (!form) return;
-
-            clearForm();
-
-            const heading = document.createElement("h3");
-            heading.textContent = "Create Folder";
-
-            const label = document.createElement("label");
-            label.textContent = "Folder Name:";
-            label.htmlFor = "name";
-
-            const input = document.createElement("input");
-            input.type = "text";
-            input.name = "name";
-            input.id = "name";
-            input.required = true;
-
-            const submit = document.createElement("button");
-            submit.type = "submit";
-            submit.textContent = "Create";
-
-            const cancel = document.createElement("button");
-            cancel.type = "button";
-            cancel.textContent = "Cancel";
-            cancel.addEventListener("click", closeModal);
-
-            form.appendChild(heading);
-            form.appendChild(label);
-            form.appendChild(input);
-            form.appendChild(submit);
-            form.appendChild(cancel);
-
-            form.action = "/folder";
-            form.method = "POST";
-
-            openModal();
-            input.focus();
-        });
-    }
-
-    // --- Add File buttons (event delegation) ---
+    // One click handler for the whole page
     document.addEventListener("click", (e) => {
-        const btn = e.target.closest(".addFileBtn");
-        if (!btn) return;
-
-        e.preventDefault();
-        if (!form) return;
-
-        // NOTE: HTML data-* attrs are case-insensitive, so data-folderId becomes dataset.folderid in practice.
-        const folderId = btn.dataset.folderid || btn.dataset.folderId;
-        if (!folderId) {
-            console.error("Add File button missing data-folderid attribute.");
+        // Add Folder
+        const newFolderBtn = e.target.closest("#newFolderBtn");
+        if (newFolderBtn) {
+            e.preventDefault();
+            openModalFromTemplate("tpl-add-folder");
             return;
         }
 
-        clearForm();
+        // Rename Folder
+        const renameFolderBtn = e.target.closest(".renameFolder");
+        if (renameFolderBtn) {
+            e.preventDefault();
+            const folderId = renameFolderBtn.dataset.folderid;
+            openModalFromTemplate("tpl-rename-folder");
+            const form = document.getElementById("form-rename-folder");
+            if (form && folderId) form.action = `/folder/${folderId}/update`;
+            return;
+        }
 
-        const heading = document.createElement("h3");
-        heading.textContent = "Upload File";
+        // Delete Folder
+        const deleteFolderBtn = e.target.closest(".deleteFolder");
+        if (deleteFolderBtn) {
+            e.preventDefault();
+            const folderId = deleteFolderBtn.dataset.folderid;
+            openModalFromTemplate("tpl-delete-folder");
+            const form = document.getElementById("form-delete-folder");
+            if (form && folderId) form.action = `/folder/${folderId}/delete`;
+            return;
+        }
 
-        const fileLabel = document.createElement("label");
-        fileLabel.textContent = "File:";
-        fileLabel.htmlFor = "file";
+        // Add File
+        const addFileBtn = e.target.closest(".addFileBtn");
+        if (addFileBtn) {
+            e.preventDefault();
+            const folderId = addFileBtn.dataset.folderid;
+            openModalFromTemplate("tpl-add-file");
+            const form = document.getElementById("form-add-file");
+            if (form && folderId) form.action = `/file/${folderId}`;
+            return;
+        }
 
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.name = "file"; // must match upload.single('file')
-        fileInput.id = "file";
-        fileInput.required = true;
+        // Rename File
+        const renameFileBtn = e.target.closest(".renameFileBtn");
+        if (renameFileBtn) {
+            e.preventDefault();
+            const fileId = renameFileBtn.dataset.fileid;
+            openModalFromTemplate("tpl-rename-file");
+            const form = document.getElementById("form-rename-file");
+            if (form && fileId) form.action = `/file/${fileId}/update`;
+            return;
+        }
 
-        const hiddenFolderId = document.createElement("input");
-        hiddenFolderId.type = "hidden";
-        hiddenFolderId.name = "folderId";
-        hiddenFolderId.value = folderId;
+        // Delete File
+        const deleteFileBtn = e.target.closest(".deleteFileBtn");
+        if (deleteFileBtn) {
+            e.preventDefault();
+            const fileId = deleteFileBtn.dataset.fileid;
+            openModalFromTemplate("tpl-delete-file");
+            const form = document.getElementById("form-delete-file");
+            if (form && fileId) form.action = `/file/${fileId}/delete`;
+            return;
+        }
 
-        const submit = document.createElement("button");
-        submit.type = "submit";
-        submit.textContent = "Upload";
-
-        const cancel = document.createElement("button");
-        cancel.type = "button";
-        cancel.textContent = "Cancel";
-        cancel.addEventListener("click", closeModal);
-
-        form.appendChild(heading);
-        form.appendChild(fileLabel);
-        form.appendChild(fileInput);
-        form.appendChild(hiddenFolderId);
-        form.appendChild(submit);
-        form.appendChild(cancel);
-
-        form.action = `/file/${folderId}`;
-        form.method = "POST";
-        form.enctype = "multipart/form-data"; // required for multer
-
-        openModal();
+        // Close buttons (in case you want delegation for those too)
+        const closeBtn = e.target.closest("[data-close]");
+        if (closeBtn) {
+            e.preventDefault();
+            closeModal();
+        }
     });
 });
