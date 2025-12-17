@@ -88,7 +88,7 @@ async function renameFilePost(req, res, next) {
                 userId,
             },
             data: {
-                displayName: finalName,
+                displayName: newName,
             },
         });
 

@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma.js';
 
 const validateSignup = [
     body('signupName').trim()
@@ -74,7 +74,7 @@ const validateFileUniqueInFolder = [
 
         const existing = await prisma.file.findFirst({
             where: {
-                name: req.file.originalname,
+                displayName: req.file.originalname,
                 folderId,
                 userId: req.user.id,
             },
@@ -93,6 +93,25 @@ const validateNewFileDisplayName = [
     body('newName').trim
         .notEmpty().withMessage('New name is required')
         .isLength({ max: 60 }).withMessage('Name must be 60 chars or less.')
-]
+        .custom(async (value, { req }) => {
+            const folderId = Number.parseInt(req.params.folderId, 10);
+            if (!Number.isInteger(folderId) || folderId <= 0) {
+                throw new Error('Invalid folder');
+            }
+
+            const existing = await prisma.file.findFirst({
+                where: {
+                    displayName: req.body.newName,
+                    folderId,
+                    userId: req.user.id
+                },
+                select: { id: true },
+            });
+            if (existing) {
+                throw new Error("A file with this name already exists");
+            }
+            return true;
+        }),
+];
 
 export default { validateLogin, validateSignup, validateFolder, validateFileUniqueInFolder, validateNewFileDisplayName }
