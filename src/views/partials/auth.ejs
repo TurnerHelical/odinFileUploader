@@ -14,17 +14,26 @@
         </form>
         <form action="/user/signup" method="POST">
             <h2>Signup</h2>
+            <% if (errors && errors.length > 0) { %>
+                <% errors.forEach((error) => { %>
+                    <p><%- error.msg %></p>
+                <% }) %>
+            <%}%>
             <div>
                 <label for="signupName">Name (optional): </label>
-                <input type="text" name="signupName" id="signupName">
+                <input type="text" name="signupName" id="signupName" value="<%= data.signupName %>">
             </div>
             <div>
                 <label for="signupEmail">Email: </label>
-                <input type="email" name="signupEmail" id="signupEmail">
+                <input type="email" name="signupEmail" id="signupEmail" value="<%= data.signupEmail %>">
             </div>
             <div>
                 <label for="signupPassword">Password: </label>
                 <input type="password" name="signupPassword" id="signupPassword">
+            </div>
+            <div>
+                <label for="signupConfirmPassword">Password: </label>
+                <input type="password" name="signupConfirmPassword" id="signupConfirmPassword">
             </div>
             <button type="submit">Submit</button>
         </form>

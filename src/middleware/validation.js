@@ -11,7 +11,12 @@ const validateSignup = [
         .isEmail().withMessage('Must be valid email').bail()
         .isLength({ max: 254 }).withMessage('Email must be less than 255 characters').bail()
         .custom(async (value) => {
-            const checkUnique = await prisma.findUnique(value);
+            const checkUnique = await prisma.user.findFirst({
+                where: {
+                    email: value
+                },
+                select: { id: true }
+            });
             if (checkUnique) {
                 throw new Error("Email is already registered");
             }

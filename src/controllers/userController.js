@@ -36,6 +36,7 @@ async function postSignup(req, res, next) {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log(errors);
             return res.render('homepage', {
                 errors: errors.array(),
                 data: {
