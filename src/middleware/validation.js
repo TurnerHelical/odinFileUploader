@@ -89,4 +89,10 @@ const validateFileUniqueInFolder = [
     }),
 ];
 
-export default { validateLogin, validateSignup, validateFolder, validateFileUniqueInFolder }
+const validateNewFileDisplayName = [
+    body('newName').trim
+        .notEmpty().withMessage('New name is required')
+        .isLength({ max: 60 }).withMessage('Name must be 60 chars or less.')
+]
+
+export default { validateLogin, validateSignup, validateFolder, validateFileUniqueInFolder, validateNewFileDisplayName }

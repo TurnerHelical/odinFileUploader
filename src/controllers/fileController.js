@@ -9,7 +9,6 @@ async function postNewFile(req, res, next) {
         if (!errors.isEmpty()) {
             return res.render('homepage', {
                 errors: errors.array(),
-                data: req.body,
             })
         }
 
@@ -29,7 +28,8 @@ async function postNewFile(req, res, next) {
 
         await prisma.file.create({
             data: {
-                name: req.file.originalname,
+                displayName: req.file.originalname,
+                storedAs: req.file.filename,
                 mimeType: req.file.mimetype,
                 size: req.file.size,
                 storagePath: req.file.path,
@@ -50,6 +50,15 @@ async function postNewFile(req, res, next) {
 
 async function renameFilePost(req, res, next) {
     try {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.render('homepage', {
+                errors: errors.array(),
+                data: { newName: req.body.newName },
+            });
+        };
+
         if (!req.user) return res.redirect('/');
 
         const fileId = Number(req.params.id);
@@ -72,18 +81,6 @@ async function renameFilePost(req, res, next) {
             return res.status(404).send('File not found');
         }
 
-        const oldPath = file.storagePath;
-
-        const ext = path.extname(file.name);
-        const base = path.basename(newName, path.extname(newName));
-        const finalName = base + ext;
-
-        const dir = path.dirname(oldPath);
-        const newPath = path.join(dir, finalName);
-
-        // 2) Rename on disk
-        await fs.rename(oldPath, newPath);
-
         // 3) Update DB
         const result = await prisma.file.updateMany({
             where: {
@@ -91,13 +88,11 @@ async function renameFilePost(req, res, next) {
                 userId,
             },
             data: {
-                name: finalName,
-                storagePath: newPath,
+                displayName: finalName,
             },
         });
 
         if (result.count === 0) {
-            // In a perfect world, we’d roll back the fs.rename here, but usually this won't happen.
             return res.status(404).send('File not found or not owned by you');
         }
 
