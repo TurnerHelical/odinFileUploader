@@ -9,6 +9,7 @@ router.get('/', attachUserFolders, (req, res) => {
         title: 'Odin Cloud Storage',
         stylesheet: '/styles/homepage.css',
         errors: res.locals.flash?.errors || [],
+        fileError: res.locals.flash?.fileError || [],
         data: res.locals.flash?.data || {},
     })
 });

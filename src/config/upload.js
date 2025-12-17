@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 
-const BASE_UPLOAD_DIR = process.env.UPLOAD_BASE_DIR //|| path.join(process.cwd(), 'uploads');
+const BASE_UPLOAD_DIR = process.env.UPLOAD_BASE_DIR || path.join(process.cwd(), 'uploads');
 
 const MAX_SIZE = 50 * 1024 * 1024;
 

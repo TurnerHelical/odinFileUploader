@@ -33,6 +33,11 @@
                
             </div>
         </div>
+        <% if (fileError && fileError.folderId === folder.id)  { %>
+                <% fileError.messages.forEach((msg) => { %>
+                    <p><%- msg %></p>
+                <% }) %>
+            <%}%>
         <button class="addFileBtn" data-folderId='<%-folder.id %>'>Add File</button>
     <%}) %>
     <% } %>
