@@ -38,6 +38,12 @@ app.use(
     })
 );
 
+app.use((req, res, next) => {
+    res.locals.flash = req.session.flash || null;
+    delete req.session.flash;
+    next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 

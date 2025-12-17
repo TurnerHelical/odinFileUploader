@@ -8,13 +8,17 @@ const UPLOAD_BASE_DIR = process.env.UPLOAD_ROOT || '/home/hunter/odinStorageUplo
 
 async function postNewFolder(req, res, next) {
     try {
+
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
-            return res.render('/', {
+            req.session.flash = {
                 errors: errors.array(),
                 data: { folderName: req.body.name || '' },
-            })
+            };
+            return res.redirect('/')
         }
+
         if (!req.user) {
             return res.redirect('/');
         };
@@ -27,10 +31,12 @@ async function postNewFolder(req, res, next) {
         return res.redirect('/');
     } catch (err) {
         if (err.code === 'P2002') {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: [{ msg: 'You already have a folder with that name' }],
-                data: { folderName: req.body.name },
-            })
+                data: { folderName: req.body.name || '' },
+            };
+            return res.redirect('/');
+
         }
         return next(err);
     }
@@ -40,10 +46,11 @@ async function postUpdateFolder(req, res, next) {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: errors.array(),
                 data: { newName: req.body.newName || '', folderId: req.body.folderId },
-            });
+            };
+            return res.redirect('/');
         };
 
 
@@ -72,10 +79,11 @@ async function postUpdateFolder(req, res, next) {
         return res.redirect('/');
     } catch (err) {
         if (err.code === 'P2002') {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: [{ msg: 'You already have a folder with that name' }],
                 data: { folderName: req.body.name || '' },
-            })
+            };
+            res.redirect('/');
         }
         return next(err);
     }

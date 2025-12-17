@@ -8,8 +8,8 @@ router.get('/', attachUserFolders, (req, res) => {
     res.render('homepage', {
         title: 'Odin Cloud Storage',
         stylesheet: '/styles/homepage.css',
-        errors: '',
-        data: '',
+        errors: res.locals.flash?.errors || [],
+        data: res.locals.flash?.data || {},
     })
 });
 

@@ -28,7 +28,8 @@ const validateSignup = [
             minLength: 6,
             minLowercase: 1,
             minUppercase: 1,
-            minSymbols: 1,
+            minNumbers: 0,
+            minSymbols: 0,
         }).withMessage('Password must contain at least 6 characters, 1 lowercase, 1 uppercase, and 1 special character'),
     body('signupConfirmPassword').trim()
         .notEmpty().withMessage('Please confirm password').bail()
@@ -49,7 +50,7 @@ const validateLogin = [
 ];
 
 const validateFolder = [
-    body('folderName').trim()
+    body('name').trim()
         .notEmpty().withMessage('Folder must have a name').bail()
         .isLength({ max: 60 }).withMessage('Folder name must be 60 chars or less').bail()
         .custom(async (value, { req }) => {

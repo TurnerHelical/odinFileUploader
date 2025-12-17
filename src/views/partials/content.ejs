@@ -1,10 +1,16 @@
 <div>
     <button id="newFolderBtn">Add new folder</button>
     <h2>Folders are here</h2>
-    <% if (!currentUser.folders || currentUser.folders.length <= 0) { %>
+    <% const folders = currentUser?.folders ?? []; %>
+    <% if (errors && errors.length > 0) { %>
+                <% errors.forEach((error) => { %>
+                    <p><%- error.msg %></p>
+                <% }) %>
+            <%}%>
+    <% if (folders.length === 0) { %>
         <p>No Folders yet! Set some up!</p>
-    <%}%>
-    <% currentUser.folders.forEach((folder) => { %>
+    <%} else {%>
+    <% folders.forEach((folder) => { %>
         <div>
             <p><%= folder.name %></p>
             <div class="folderOptionsMenu">
@@ -19,7 +25,7 @@
                <% } %>
                 <% folder.files.forEach((file) => { %>
                     <div class="fileItem">
-                        <p><%- file.name %></p>
+                        <p><%- file.displayName %></p>
                         <button class="renameFileBtn" data-fileId="<%-file.id%>">Rename File</button>
                         <button class="deleteFileBtn" data-fileId="<%-file.id%>">Delete File</button>    
                     </div>
@@ -29,6 +35,7 @@
         </div>
         <button class="addFileBtn" data-folderId='<%-folder.id %>'>Add File</button>
     <%}) %>
+    <% } %>
     <div id="modal" class="hidden" aria-hidden="true">
         <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <div id="modalBody"></div>
