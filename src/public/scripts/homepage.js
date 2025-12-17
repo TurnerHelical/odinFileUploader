@@ -37,9 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const bg = document.getElementById("background");
     if (bg) bg.addEventListener("click", closeModal);
 
-    // One click handler for the whole page
+
     document.addEventListener("click", (e) => {
-        // Add Folder
+
         const newFolderBtn = e.target.closest("#newFolderBtn");
         if (newFolderBtn) {
             e.preventDefault();
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Rename Folder
+
         const renameFolderBtn = e.target.closest(".renameFolder");
         if (renameFolderBtn) {
             e.preventDefault();
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Delete Folder
+
         const deleteFolderBtn = e.target.closest(".deleteFolder");
         if (deleteFolderBtn) {
             e.preventDefault();
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Add File
+
         const addFileBtn = e.target.closest(".addFileBtn");
         if (addFileBtn) {
             e.preventDefault();
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Rename File
+
         const renameFileBtn = e.target.closest(".renameFileBtn");
         if (renameFileBtn) {
             e.preventDefault();
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Delete File
+
         const deleteFileBtn = e.target.closest(".deleteFileBtn");
         if (deleteFileBtn) {
             e.preventDefault();
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Close buttons (in case you want delegation for those too)
+
         const closeBtn = e.target.closest("[data-close]");
         if (closeBtn) {
             e.preventDefault();

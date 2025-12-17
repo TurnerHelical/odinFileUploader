@@ -1,12 +1,20 @@
 import { prisma } from '../lib/prisma.js';
 import path from 'path';
 import fs from 'fs/promises';
+import { validationResult } from 'express-validator';
 
 const UPLOAD_BASE_DIR = process.env.UPLOAD_ROOT || '/home/hunter/odinStorageUploads';
 
 
 async function postNewFolder(req, res, next) {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('/', {
+                errors: errors.array(),
+                data: { folderName: req.body.name || '' },
+            })
+        }
         if (!req.user) {
             return res.redirect('/');
         };
@@ -30,6 +38,15 @@ async function postNewFolder(req, res, next) {
 
 async function postUpdateFolder(req, res, next) {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('homepage', {
+                errors: errors.array(),
+                data: { newName: req.body.newName, folderId: req.body.folderId },
+            });
+        };
+
+
         if (!req.user) {
             return res.redirect('/');
         }
@@ -71,7 +88,7 @@ async function postDeleteFolder(req, res, next) {
         const folderId = Number(req.params.id);
         const userId = req.user.id;
 
-        // 1) Make sure folder exists + belongs to the user
+
         const folder = await prisma.folder.findFirst({
             where: { id: folderId, userId },
             select: { id: true },
@@ -81,18 +98,17 @@ async function postDeleteFolder(req, res, next) {
             return res.status(404).send('Folder not found or not owned by you');
         }
 
-        // 2) Delete folder directory on disk (recursive)
-        // Your disk structure is .../users/<userId>/<folderId>/...
+
         const folderDiskPath = path.join(UPLOAD_BASE_DIR, 'users', String(userId), String(folderId));
 
         try {
             await fs.rm(folderDiskPath, { recursive: true, force: true });
         } catch (fsErr) {
-            // If you want to *block* DB deletion when disk deletion fails, return next(fsErr) instead.
+
             console.error('Error deleting folder from disk:', fsErr.message);
         }
 
-        // 3) Delete DB rows
+
         await prisma.$transaction([
             prisma.file.deleteMany({ where: { folderId, userId } }),
             prisma.folder.deleteMany({ where: { id: folderId, userId } }),

@@ -52,4 +52,6 @@ model File {
   folderId    Int
   owner       User     @relation(fields: [userId], references: [id])
   userId      Int
+
+  @@unique([name, folderId, userId])
 }

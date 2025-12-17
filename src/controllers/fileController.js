@@ -1,13 +1,18 @@
 import { prisma } from '../lib/prisma.js';
 import path from 'path';
+import { validationResult } from 'express-validator';
 import fs from 'fs/promises';
 
 async function postNewFile(req, res, next) {
     try {
-        console.log('upload body:', req.body);
-        console.log('folderId raw:', req.body.folderId, '->', Number(req.body.folderId));
-        console.log('userId:', req.user?.id);
-        console.log('file:', req.file?.originalname, req.file?.path);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('homepage', {
+                errors: errors.array(),
+                data: req.body,
+            })
+        }
+
         const userId = req.user.id;
         const folderId = Number(req.params.folderId);
 
@@ -36,6 +41,9 @@ async function postNewFile(req, res, next) {
 
         res.redirect(`/`);
     } catch (err) {
+        if (err.code === 'P2002') {
+            return res.status(400).send('A file with that name already exists in this folder.');
+        }
         next(err);
     }
 }
