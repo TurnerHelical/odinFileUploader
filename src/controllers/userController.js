@@ -6,21 +6,23 @@ import { validationResult } from 'express-validator';
 async function postLogin(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.render('homepage', {
+        req.session.flash = {
             errors: errors.array(),
             data: { email: req.body.loginEmail || '' }
-        })
-    }
+        };
+        res.redirect('/');
+    };
 
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
         }
         if (!user) {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: [{ msg: info?.message || 'Invalid credentials' }],
                 data: { email: req.body.loginEmail || '' },
-            });
+            };
+            res.redirect('/');
         }
         req.logIn(user, (err2) => {
             if (err2) {
@@ -37,14 +39,15 @@ async function postSignup(req, res, next) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             console.log(errors);
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: errors.array(),
                 data: {
                     signupName: req.body.signupName || '',
                     signupEmail: req.body.signupEmail || '',
                 }
-            })
-        }
+            };
+            res.redirect('/');
+        };
 
         const passwordHash = await bcrypt.hash(req.body.signupPassword, 10);
 
@@ -63,10 +66,10 @@ async function postSignup(req, res, next) {
         })
     } catch (err) {
         if (err.code === 'P2002') {
-            return res.render('signUp', {
+            req.session.flash = {
                 errors: [{ msg: "Email or username already in use" }],
                 data: req.body
-            });
+            };
         }
         return next(err);
     }

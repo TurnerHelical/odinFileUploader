@@ -68,6 +68,25 @@ const validateFolder = [
         }),
 ];
 
+const validateNewFolderName = [
+    body('newName').trim()
+        .notEmpty().withMessage('Folder must have a name').bail()
+        .isLength({ max: 60 }).withMessage('Folder name must be 60 chars or less').bail()
+        .custom(async (value, { req }) => {
+            const existing = await prisma.folder.findFirst({
+                where: {
+                    userId: req.user.id,
+                    name: value,
+                },
+                select: { id: true },
+            });
+            if (existing) {
+                throw new Error('You already have a folder with this name');
+            }
+            return true;
+        }),
+]
+
 const validateFileUniqueInFolder = [
     body().custom(async (_, { req }) => {
         if (!req.user) throw new Error('Not authenticated');
@@ -120,4 +139,4 @@ const validateNewFileDisplayName = [
         }),
 ];
 
-export default { validateLogin, validateSignup, validateFolder, validateFileUniqueInFolder, validateNewFileDisplayName }
+export default { validateLogin, validateSignup, validateFolder, validateFileUniqueInFolder, validateNewFileDisplayName, validateNewFolderName }

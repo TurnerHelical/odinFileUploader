@@ -7,10 +7,11 @@ async function postNewFile(req, res, next) {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: errors.array(),
-            })
-        }
+            };
+            res.redirect('/');
+        };
 
         const userId = req.user.id;
         const folderId = Number(req.params.folderId);
@@ -53,10 +54,11 @@ async function renameFilePost(req, res, next) {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-            return res.render('homepage', {
+            req.session.flash = {
                 errors: errors.array(),
                 data: { newName: req.body.newName || '' },
-            });
+            };
+            res.redirect('/');
         };
 
         if (!req.user) return res.redirect('/');
