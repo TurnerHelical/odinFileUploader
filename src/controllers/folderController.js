@@ -42,7 +42,7 @@ async function postUpdateFolder(req, res, next) {
         if (!errors.isEmpty()) {
             return res.render('homepage', {
                 errors: errors.array(),
-                data: { newName: req.body.newName, folderId: req.body.folderId },
+                data: { newName: req.body.newName || '', folderId: req.body.folderId },
             });
         };
 
@@ -74,7 +74,7 @@ async function postUpdateFolder(req, res, next) {
         if (err.code === 'P2002') {
             return res.render('homepage', {
                 errors: [{ msg: 'You already have a folder with that name' }],
-                data: { folderName: req.body.name },
+                data: { folderName: req.body.name || '' },
             })
         }
         return next(err);

@@ -1,8 +1,17 @@
 import { prisma } from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
 import passport from '../auth/passport.js';
+import { validationResult } from 'express-validator';
 
 async function postLogin(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render('homepage', {
+            errors: errors.array(),
+            data: { email: req.body.loginEmail || '' }
+        })
+    }
+
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
@@ -24,6 +33,17 @@ async function postLogin(req, res, next) {
 
 async function postSignup(req, res, next) {
     try {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('homepage', {
+                errors: errors.array(),
+                data: {
+                    signupName: req.body.signupName || '',
+                    signupEmail: req.body.signupEmail || '',
+                }
+            })
+        }
 
         const passwordHash = await bcrypt.hash(req.body.signupPassword, 10);
 

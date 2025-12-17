@@ -55,7 +55,7 @@ async function renameFilePost(req, res, next) {
         if (!errors.isEmpty()) {
             return res.render('homepage', {
                 errors: errors.array(),
-                data: { newName: req.body.newName },
+                data: { newName: req.body.newName || '' },
             });
         };
 

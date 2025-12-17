@@ -42,7 +42,8 @@ model Folder {
 
 model File {
   id          Int      @id @default(autoincrement())
-  name        String
+  displayName String
+  storedAs    String
   mimeType    String
   size        Int
   storagePath String?
@@ -52,4 +53,6 @@ model File {
   folderId    Int
   owner       User     @relation(fields: [userId], references: [id])
   userId      Int
+
+  @@unique([displayName, folderId, userId])
 }
