@@ -1,28 +1,31 @@
-<div>
-    <button id="newFolderBtn">Add new folder</button>
-    <h2>Folders are here</h2>
+<div id="contentCtr">
+    <h2 id="pageTitle">User Storage</h2>
+    
+    <div id="folderCtr">
+      <button id="newFolderBtn">Add new folder</button>
     <% const folders = currentUser?.folders ?? []; %>
     <% const folderFileError = locals.fileError || null; %>
-    <% if (errors && errors.length > 0) { %>
-                <% errors.forEach((error) => { %>
-                    <p><%- error.msg %></p>
-                <% }) %>
-            <%}%>
+    
     <% if (folders.length === 0) { %>
         <p>No Folders yet! Set some up!</p>
     <%} else {%>
     <% folders.forEach((folder) => { %>
-        <div>
-            <p><%= folder.name %></p>
-            <div class="folderOptionsMenu">
-                <div>
+        <div class="folder">
+          <div class="folderName">
+            <h2><%= folder.name %></h2>
+            <svg data-folderId='<%-folder.id%>' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M320 208C289.1 208 264 182.9 264 152C264 121.1 289.1 96 320 96C350.9 96 376 121.1 376 152C376 182.9 350.9 208 320 208zM320 432C350.9 432 376 457.1 376 488C376 518.9 350.9 544 320 544C289.1 544 264 518.9 264 488C264 457.1 289.1 432 320 432zM376 320C376 350.9 350.9 376 320 376C289.1 376 264 350.9 264 320C264 289.1 289.1 264 320 264C350.9 264 376 289.1 376 320z"/></svg>
+            <div class="folderOptionsMenu hidden" data-folderId='<%-folder.id%>'>
+              
+                
                   <button class="renameFolder" data-folderId="<%- folder.id %>">Rename Folder</button>
                   <button class="deleteFolder" data-folderId="<%- folder.id %>">Delete Folder</button>
-                </div>
+                
             </div>
-            <div class="fileDropdownCtr">
+            </div>
+            <div class="fileDropdownCtr hidden">
+              <div class="filesCtr">
                 <% if (!folder.files || folder.files.length <= 0) { %>
-                    <p> No files in this folder yet!</p>
+                    <p class=""> No files in this folder yet!</p>
                <% } %>
                 <% folder.files.forEach((file) => { %>
                     <div class="fileItem">
@@ -31,17 +34,20 @@
                         <button class="deleteFileBtn" data-fileId="<%-file.id%>">Delete File</button>    
                     </div>
                <% }) %>
-               
+              </div>
+               <button class="addFileBtn " data-folderId='<%-folder.id %>'>Add File</button>
             </div>
+            
         </div>
         <% if (fileError && fileError.folderId === folder.id)  { %>
                 <% fileError.messages.forEach((msg) => { %>
                     <p><%- msg %></p>
                 <% }) %>
             <%}%>
-        <button class="addFileBtn" data-folderId='<%-folder.id %>'>Add File</button>
+        
     <%}) %>
     <% } %>
+    </div>
     <div id="modal" class="hidden" aria-hidden="true">
         <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <div id="modalBody"></div>
@@ -50,6 +56,11 @@
 
     <div id="background" class="hidden"></div>
 <template id="tpl-add-folder">
+  <% if (errors && errors.length > 0) { %>
+                <% errors.forEach((error) => { %>
+                    <p><%- error.msg %></p>
+                <% }) %>
+            <%}%>
   <form id="form-add-folder" action="/folder" method="POST">
     <h3 id="modalTitle">Add Folder</h3>
 
@@ -65,6 +76,11 @@
 
 <template id="tpl-rename-folder">
   <form id="form-rename-folder" method="POST">
+    <% if (errors && errors.length > 0) { %>
+                <% errors.forEach((error) => { %>
+                    <p><%- error.msg %></p>
+                <% }) %>
+            <%}%>
     <h3 id="modalTitle">Rename Folder</h3>
 
     <input type="hidden" name="folderId" id="renameFolderId" />
