@@ -2,6 +2,7 @@
     <button id="newFolderBtn">Add new folder</button>
     <h2>Folders are here</h2>
     <% const folders = currentUser?.folders ?? []; %>
+    <% const folderFileError = locals.fileError || null; %>
     <% if (errors && errors.length > 0) { %>
                 <% errors.forEach((error) => { %>
                     <p><%- error.msg %></p>

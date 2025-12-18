@@ -17,7 +17,7 @@ function openModalFromTemplate(templateId) {
     modal.classList.remove("hidden");
     bg.classList.remove("hidden");
 
-    // Close buttons inside the injected content
+
     body.querySelectorAll("[data-close]").forEach((btn) => {
         btn.addEventListener("click", closeModal);
     });
@@ -34,6 +34,67 @@ function closeModal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    const state = window.__MODAL_STATE__ || null;
+
+    if (state?.id) {
+
+        openModalFromTemplate(state.id);
+
+
+        if (state.id === "tpl-add-file" && state.folderId) {
+            const form = document.getElementById("form-add-file");
+            if (form) form.action = `/file/${state.folderId}`;
+        }
+
+        if (state.id === "tpl-rename-folder" && state.folderId) {
+            const form = document.getElementById("form-rename-folder");
+            if (form) form.action = `/folder/${state.folderId}/update`;
+
+
+            const input = document.getElementById("renameFolderId");
+            if (input) input.value = state.folderId;
+        }
+
+        if (state.id === "tpl-delete-folder" && state.folderId) {
+            const form = document.getElementById("form-delete-folder");
+            if (form) form.action = `/folder/${state.folderId}/delete`;
+
+
+            const input = document.getElementById("deleteFolderId");
+            if (input) input.value = state.folderId;
+        }
+
+        if (state.id === "tpl-rename-file" && state.fileId) {
+            const form = document.getElementById("form-rename-file");
+            if (form) form.action = `/file/${state.fileId}/update`;
+
+
+            const input = document.getElementById("renameFileId");
+            if (input) input.value = state.fileId;
+        }
+
+        if (state.id === "tpl-delete-file" && state.fileId) {
+            const form = document.getElementById("form-delete-file");
+            if (form) form.action = `/file/${state.fileId}/delete`;
+
+
+            const input = document.getElementById("deleteFileId");
+            if (input) input.value = state.fileId;
+        }
+
+
+        if (state.values && state.formId) {
+            const form = document.getElementById(state.formId);
+            if (form) {
+                Object.entries(state.values).forEach(([name, value]) => {
+                    const el = form.querySelector(`[name="${name}"]`);
+                    if (el && el.type !== "file") {
+                        el.value = value ?? "";
+                    }
+                });
+            }
+        }
+    }
     const bg = document.getElementById("background");
     if (bg) bg.addEventListener("click", closeModal);
 

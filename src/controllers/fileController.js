@@ -9,8 +9,13 @@ async function postNewFile(req, res, next) {
         if (!errors.isEmpty()) {
             req.session.flash = {
                 errors: errors.array(),
+                modal: {
+                    id: 'tpl-add-file',
+                    formId: 'form-add-file',
+                    folderId: Number(req.params.folderId),
+                },
             };
-            res.redirect('/');
+            return res.redirect('/');
         };
 
         const userId = req.user.id;
@@ -40,7 +45,7 @@ async function postNewFile(req, res, next) {
             }
         });
 
-        res.redirect(`/`);
+        return res.redirect(`/`);
     } catch (err) {
         if (err.code === 'P2002') {
             return res.status(400).send('A file with that name already exists in this folder.');
@@ -56,9 +61,16 @@ async function renameFilePost(req, res, next) {
         if (!errors.isEmpty()) {
             req.session.flash = {
                 errors: errors.array(),
-                data: { newName: req.body.newName || '' },
+                modal: {
+                    id: "tpl-rename-file",
+                    formId: "form-rename-file",
+                    fileId: Number(req.params.id),
+                    values: {
+                        newName: req.body.newName || "",
+                    },
+                },
             };
-            res.redirect('/');
+            return res.redirect('/');
         };
 
         if (!req.user) return res.redirect('/');

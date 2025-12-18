@@ -9,6 +9,9 @@
             <%- include('partials/content') %>
           <%}%>  
         </main>
+        <script>
+            window.__MODAL_STATE__ = <%- JSON.stringify(modalState || null) %>;
+        </script>
         <script src="/scripts/homepage.js"></script>
     </body>
 </html>

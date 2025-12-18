@@ -14,7 +14,12 @@ async function postNewFolder(req, res, next) {
         if (!errors.isEmpty()) {
             req.session.flash = {
                 errors: errors.array(),
-                data: { folderName: req.body.name || '' },
+                modal: {
+                    id: 'tpl-add-folder',
+                    formId: 'form-add-folder',
+                    values: { name: req.body.name || '' },
+                }
+
             };
             return res.redirect('/')
         }
@@ -33,8 +38,12 @@ async function postNewFolder(req, res, next) {
         if (err.code === 'P2002') {
             req.session.flash = {
                 errors: [{ msg: 'You already have a folder with that name' }],
-                data: { folderName: req.body.name || '' },
-            };
+                modal: {
+                    id: 'tpl-add-folder',
+                    formId: 'form-add-folder',
+                    values: { name: req.body.name || '' },
+                },
+            }
             return res.redirect('/');
 
         }
@@ -48,8 +57,16 @@ async function postUpdateFolder(req, res, next) {
         if (!errors.isEmpty()) {
             req.session.flash = {
                 errors: errors.array(),
-                data: { newName: req.body.newName || '', folderId: req.body.folderId },
-            };
+                modal: {
+                    id: "tpl-rename-folder",
+                    formId: "form-rename-folder",
+                    folderId: Number(req.params.id),
+                    values: {
+                        newName: req.body.newName || "",
+                    },
+
+                },
+            }
             return res.redirect('/');
         };
 
@@ -81,9 +98,16 @@ async function postUpdateFolder(req, res, next) {
         if (err.code === 'P2002') {
             req.session.flash = {
                 errors: [{ msg: 'You already have a folder with that name' }],
-                data: { folderName: req.body.name || '' },
-            };
-            res.redirect('/');
+                dmodal: {
+                    id: 'tpl-rename-folder',
+                    formId: 'form-rename-folder',
+                    folderId: Number(req.params.id),
+                    values: {
+                        newName: req.body.newName || '',
+                    },
+                }
+            }
+            return res.redirect('/');
         }
         return next(err);
     }
