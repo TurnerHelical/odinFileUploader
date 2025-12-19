@@ -32,15 +32,22 @@ function closeModal() {
     if (body) body.innerHTML = "";
 }
 
-function closeAllFolderMenus() {
+function closeAllFolderMenus(except = null) {
     document.querySelectorAll(".folderOptionsMenu").forEach((menu) => {
-        menu.classList.add("hidden");
+        if (menu !== except) menu.classList.add("hidden");
+    });
+}
+
+function closeAllFileMenus(except = null) {
+    document.querySelectorAll(".fileButtonCtr").forEach((menu) => {
+        if (menu !== except) menu.classList.add("hidden");
     });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const state = window.__MODAL_STATE__ || null;
 
+    // Restore modal state (server-driven)
     if (state?.id) {
         openModalFromTemplate(state.id);
 
@@ -86,9 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (form) {
                 Object.entries(state.values).forEach(([name, value]) => {
                     const el = form.querySelector(`[name="${name}"]`);
-                    if (el && el.type !== "file") {
-                        el.value = value ?? "";
-                    }
+                    if (el && el.type !== "file") el.value = value ?? "";
                 });
             }
         }
@@ -98,55 +103,80 @@ document.addEventListener("DOMContentLoaded", () => {
     if (bg) bg.addEventListener("click", closeModal);
 
     document.addEventListener("click", (e) => {
-        const folderHeader = e.target.closest(".folderName");
-        if (folderHeader) {
-            // If the click was on the svg, let the svg handler below run
-            if (!e.target.closest('svg[data-folderid]')) {
-                const folder = folderHeader.closest(".folder");
-                if (!folder) return;
-
-                const dropdown = folder.querySelector(".fileDropdownCtr");
-                if (!dropdown) return;
-
-                dropdown.classList.toggle("hidden");
-            }
-
-            // IMPORTANT: do NOT return here, so svg clicks can fall through
-        }
-        // -----------------------------
-        // Folder options menu (SVG)
-        // -----------------------------
+        // -------------------------------------------------------
+        // 1) Folder options menu (3 dots SVG) - handle FIRST
+        // -------------------------------------------------------
         const folderIcon = e.target.closest('svg[data-folderid]');
         if (folderIcon) {
             e.preventDefault();
 
             const folderId = folderIcon.dataset.folderid;
-
-            // Find the matching menu for this folder
             const menu = document.querySelector(
                 `.folderOptionsMenu[data-folderid="${folderId}"]`
             );
 
             if (!menu) return;
 
-            // Close all other menus first
-            document.querySelectorAll(".folderOptionsMenu").forEach((m) => {
-                if (m !== menu) m.classList.add("hidden");
-            });
-
-            // Toggle only this one
+            closeAllFolderMenus(menu);
+            closeAllFileMenus(); // optional: close file menus too
             menu.classList.toggle("hidden");
             return;
         }
 
-        // If click happens outside any folderName/menu, close all menus
-        if (!e.target.closest(".folderName") && !e.target.closest(".folderOptionsMenu")) {
-            closeAllFolderMenus();
+        // -------------------------------------------------------
+        // 2) File options menu (options.svg image)
+        // -------------------------------------------------------
+        const fileOptionsIcon = e.target.closest('img.fileOptions[data-fileid]');
+        if (fileOptionsIcon) {
+            e.preventDefault();
+
+            const fileItem = fileOptionsIcon.closest(".fileItem");
+            if (!fileItem) return;
+
+            const menu = fileItem.querySelector(".fileButtonCtr");
+            if (!menu) return;
+
+            closeAllFileMenus(menu);
+            closeAllFolderMenus(); // optional: close folder menus too
+            menu.classList.toggle("hidden");
+            return;
         }
 
-        // -----------------------------
-        // Add folder modal
-        // -----------------------------
+        // -------------------------------------------------------
+        // 3) Folder dropdown toggle (show/hide files)
+        //    Click folder header EXCEPT clicks on controls
+        // -------------------------------------------------------
+        const folderHeader = e.target.closest(".folderName");
+        if (folderHeader) {
+            // ignore clicks on interactive controls inside header
+            if (e.target.closest("button, a, input, svg")) return;
+
+            const folder = folderHeader.closest(".folder");
+            if (!folder) return;
+
+            const dropdown = folder.querySelector(".fileDropdownCtr");
+            if (!dropdown) return;
+
+            dropdown.classList.toggle("hidden");
+            return;
+        }
+
+        // -------------------------------------------------------
+        // 4) Close menus when clicking outside
+        // -------------------------------------------------------
+        if (
+            !e.target.closest(".folderOptionsMenu") &&
+            !e.target.closest('svg[data-folderid]') &&
+            !e.target.closest(".fileButtonCtr") &&
+            !e.target.closest("img.fileOptions")
+        ) {
+            closeAllFolderMenus();
+            closeAllFileMenus();
+        }
+
+        // -------------------------------------------------------
+        // 5) Modals
+        // -------------------------------------------------------
         const newFolderBtn = e.target.closest("#newFolderBtn");
         if (newFolderBtn) {
             e.preventDefault();
@@ -154,15 +184,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Rename folder modal
-        // -----------------------------
         const renameFolderBtn = e.target.closest(".renameFolder");
         if (renameFolderBtn) {
             e.preventDefault();
             const folderId = renameFolderBtn.dataset.folderid;
 
-            closeAllFolderMenus(); // optional: close menu after selecting an option
+            closeAllFolderMenus();
             openModalFromTemplate("tpl-rename-folder");
 
             const form = document.getElementById("form-rename-folder");
@@ -170,15 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Delete folder modal
-        // -----------------------------
         const deleteFolderBtn = e.target.closest(".deleteFolder");
         if (deleteFolderBtn) {
             e.preventDefault();
             const folderId = deleteFolderBtn.dataset.folderid;
 
-            closeAllFolderMenus(); // optional: close menu after selecting an option
+            closeAllFolderMenus();
             openModalFromTemplate("tpl-delete-folder");
 
             const form = document.getElementById("form-delete-folder");
@@ -186,9 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Add file modal
-        // -----------------------------
         const addFileBtn = e.target.closest(".addFileBtn");
         if (addFileBtn) {
             e.preventDefault();
@@ -201,14 +222,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Rename file modal
-        // -----------------------------
         const renameFileBtn = e.target.closest(".renameFileBtn");
         if (renameFileBtn) {
             e.preventDefault();
             const fileId = renameFileBtn.dataset.fileid;
 
+            closeAllFileMenus();
             openModalFromTemplate("tpl-rename-file");
 
             const form = document.getElementById("form-rename-file");
@@ -216,14 +235,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Delete file modal
-        // -----------------------------
         const deleteFileBtn = e.target.closest(".deleteFileBtn");
         if (deleteFileBtn) {
             e.preventDefault();
             const fileId = deleteFileBtn.dataset.fileid;
 
+            closeAllFileMenus();
             openModalFromTemplate("tpl-delete-file");
 
             const form = document.getElementById("form-delete-file");
@@ -231,9 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // -----------------------------
-        // Close modal buttons
-        // -----------------------------
         const closeBtn = e.target.closest("[data-close]");
         if (closeBtn) {
             e.preventDefault();
@@ -241,4 +255,3 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
