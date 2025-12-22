@@ -10,5 +10,6 @@ const router = Router();
 router.post('/:folderId', ensureAuth, uploadSingleWithFlash("file"), rejectPEExecutables, validation.validateFileUniqueInFolder, controller.postNewFile);
 router.post('/:id/update', ensureAuth, validation.validateNewFileDisplayName, controller.renameFilePost);
 router.post('/:id/delete', ensureAuth, controller.postDeleteFile);
+router.get('/:id/download', ensureAuth, controller.downloadFile);
 
 export default router;

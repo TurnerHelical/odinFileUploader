@@ -123,6 +123,14 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        const downloadBtn = e.target.closest(".downloadBtn");
+        if (downloadBtn) {
+            e.preventDefault();
+            const fileId = downloadBtn.dataset.fileid;
+            window.location.href = `/file/${fileId}/download`;
+            return;
+        }
+
         // -------------------------------------------------------
         // 2) File options menu (options.svg image)
         // -------------------------------------------------------

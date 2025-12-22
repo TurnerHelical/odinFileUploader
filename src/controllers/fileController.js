@@ -54,6 +54,35 @@ async function postNewFile(req, res, next) {
     }
 }
 
+async function downloadFile(req, res, next) {
+    try {
+        if (!req.user) return res.redirect('/');
+
+        const fileId = Number(req.params.id);
+        const userId = req.user.id;
+
+        // 1) Verify file ownership
+        const file = await prisma.file.findFirst({
+            where: {
+                id: fileId,
+                userId,
+            },
+        });
+
+        if (!file || !file.storagePath) {
+            return res.status(404).send('File not found');
+        }
+
+        // 2) Send file to browser
+        return res.download(
+            file.storagePath,
+            file.displayName
+        );
+    } catch (err) {
+        next(err);
+    }
+}
+
 async function renameFilePost(req, res, next) {
     try {
         const errors = validationResult(req);
@@ -157,4 +186,4 @@ async function postDeleteFile(req, res, next) {
     }
 }
 
-export default { postNewFile, renameFilePost, postDeleteFile };
+export default { postNewFile, renameFilePost, postDeleteFile, downloadFile };
